@@ -53,6 +53,7 @@ export interface IServerOptions {
     disableOPDS?: boolean;
     maxPrefetchLinks?: number;
     readers?: Readers;
+    disableCORS?: boolean;
 }
 
 // this ceiling value seems very arbitrary ... what would be a reasonable default value?
@@ -68,6 +69,7 @@ export class Server {
     public readonly disableOPDS: boolean;
     public readonly maxPrefetchLinks: number;
     public readonly readers: Readers
+    public readonly disableCORS: boolean;
 
     public readonly lcpBeginToken = "*-";
     public readonly lcpEndToken = "-*";
@@ -98,6 +100,7 @@ export class Server {
             {title: "Reader HADRIEN", getUrl: url => `/readerHADRIEN/?manifest=true&href=${url}`},
             {title: "Reader HADRIEN BASIC", getUrl: url => `https://hadriengardeur.github.io/webpub-manifest/examples/viewer/?manifest=true&href=${url}`},
         ];
+        this.disableCORS = options && options.disableCORS ? options.disableCORS : false;
 
         // note: zero not allowed (fallback to default MAX_PREFETCH_LINKS). use -1 to disable ceiling value.
         this.maxPrefetchLinks = options && options.maxPrefetchLinks ? options.maxPrefetchLinks : MAX_PREFETCH_LINKS;
@@ -295,6 +298,10 @@ Disallow: /
     }
 
     public setResponseCORS(res: express.Response) {
+        if(this.disableCORS) {
+            return;
+        }
+
         res.setHeader("Access-Control-Allow-Origin",
             "*");
 
