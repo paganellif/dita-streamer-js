@@ -80,7 +80,6 @@ export function serverRemotePub(_server: Server, topRouter: express.Application)
             + "/pub/" + urlDecodedBase64 + "/";
 
         // No need for CORS with this URL redirect (HTML page lists available services)
-        // server.setResponseCORS(res);
 
         debug(`REDIRECT: ${req.originalUrl} ==> ${redirect}`);
         res.redirect(301, redirect);

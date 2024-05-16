@@ -54,6 +54,7 @@ export interface IServerOptions {
     maxPrefetchLinks?: number;
     readers?: Readers;
     disableCORS?: boolean;
+    allowedOrigins?: string[];
 }
 
 // this ceiling value seems very arbitrary ... what would be a reasonable default value?
@@ -68,8 +69,10 @@ export class Server {
     public readonly disableRemotePubUrl: boolean;
     public readonly disableOPDS: boolean;
     public readonly maxPrefetchLinks: number;
-    public readonly readers: Readers
+    public readonly readers: Readers;
     public readonly disableCORS: boolean;
+    public readonly allowedOrigins: string[];
+    public readonly corsOptionsDelegate: any;
 
     public readonly lcpBeginToken = "*-";
     public readonly lcpEndToken = "-*";
@@ -101,6 +104,28 @@ export class Server {
             {title: "Reader HADRIEN BASIC", getUrl: url => `https://hadriengardeur.github.io/webpub-manifest/examples/viewer/?manifest=true&href=${url}`},
         ];
         this.disableCORS = options && options.disableCORS ? options.disableCORS : false;
+        this.allowedOrigins = options && options.allowedOrigins ? options.allowedOrigins : ["*"];
+        this.corsOptionsDelegate = function (_req: any, callback: any) {
+            let corsOptions;
+            if (this.disableCORS) {
+                corsOptions = { origin: false };
+            } else {
+                corsOptions = {
+                    // Configures the Access-Control-Allow-Origin CORS header.
+                    // Array of valid origins. Each origin can be a String or a RegExp.
+                    origin: this.allowedOrigins,
+                    // Configures the Access-Control-Allow-Methods CORS header.
+                    methods: ["GET", "HEAD", "OPTIONS"],
+                    // Configures the Access-Control-Allow-Headers CORS header.
+                    // tslint:disable-next-line:max-line-length
+                    allowedHeaders: ["Content-Type", "Content-Length", "Accept-Ranges", "Content-Range", "Range", "Link", "Transfer-Encoding", "X-Requested-With", "Authorization", "Accept", "Origin", "User-Agent", "DNT", "Cache-Control", "Keep-Alive", "If-Modified-Since"],
+                    //Configures the Access-Control-Expose-Headers CORS header.
+                    // tslint:disable-next-line:max-line-length
+                    exposedHeaders: ["Content-Type", "Content-Length", "Accept-Ranges", "Content-Range", "Range", "Link", "Transfer-Encoding", "X-Requested-With", "Authorization", "Accept", "Origin", "User-Agent", "DNT", "Cache-Control", "Keep-Alive", "If-Modified-Since"],
+                };
+            }
+            callback(null, corsOptions);
+        };
 
         // note: zero not allowed (fallback to default MAX_PREFETCH_LINKS). use -1 to disable ceiling value.
         this.maxPrefetchLinks = options && options.maxPrefetchLinks ? options.maxPrefetchLinks : MAX_PREFETCH_LINKS;
@@ -295,26 +320,6 @@ Disallow: /
             res.setHeader("Pragma", "no-cache");
             res.setHeader("Expires", "0");
         }
-    }
-
-    public setResponseCORS(res: express.Response) {
-        if(this.disableCORS) {
-            return;
-        }
-
-        res.setHeader("Access-Control-Allow-Origin",
-            "*");
-
-        res.setHeader("Access-Control-Allow-Methods",
-            "GET, HEAD, OPTIONS"); // POST, DELETE, PUT, PATCH
-
-        res.setHeader("Access-Control-Allow-Headers",
-            // tslint:disable-next-line:max-line-length
-            "Content-Type, Content-Length, Accept-Ranges, Content-Range, Range, Link, Transfer-Encoding, X-Requested-With, Authorization, Accept, Origin, User-Agent, DNT, Cache-Control, Keep-Alive, If-Modified-Since");
-
-        res.setHeader("Access-Control-Expose-Headers",
-            // tslint:disable-next-line:max-line-length
-            "Content-Type, Content-Length, Accept-Ranges, Content-Range, Range, Link, Transfer-Encoding, X-Requested-With, Authorization, Accept, Origin, User-Agent, DNT, Cache-Control, Keep-Alive, If-Modified-Since");
     }
 
     public addPublications(pubs: string[]): string[] {

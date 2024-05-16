@@ -12,6 +12,7 @@ import * as express from "express";
 import * as fs from "fs";
 import * as jsonMarkup from "json-markup";
 import * as path from "path";
+import * as cors from "cors";
 
 import {
     IRequestPayloadExtension, IRequestQueryParams, _jsonPath, _show,
@@ -50,6 +51,7 @@ export const serverVersion_PATH = "/version";
 export function serverVersion(server: Server, topRouter: express.Application) {
 
     topRouter.get([serverVersion_PATH, serverVersion_PATH + "/" + _show + "/:" + _jsonPath + "?"],
+    cors(server.corsOptionsDelegate),
     (req: express.Request, res: express.Response) => {
 
         const reqparams = (req as IRequestPayloadExtension).params;
@@ -83,7 +85,6 @@ export function serverVersion(server: Server, topRouter: express.Application) {
                 // "<p><pre>" + dumpStr + "</pre></p>" +
                 "</body></html>");
         } else {
-            server.setResponseCORS(res);
             res.set("Content-Type", "application/json; charset=utf-8");
 
             const jsonStr = JSON.stringify(jsonObj, null, "  ");

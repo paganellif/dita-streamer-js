@@ -11,6 +11,7 @@ import * as debug_ from "debug";
 import * as express from "express";
 import * as jsonMarkup from "json-markup";
 import * as path from "path";
+import * as cors from "cors";
 
 import { TaJsonSerialize } from "@r2-lcp-js/serializable";
 import { Publication } from "@r2-shared-js/models/publication";
@@ -56,6 +57,7 @@ export function serverMediaOverlays(server: Server, routerPathBase64: express.Ro
     // routerMediaOverlays.use(morgan("combined", { stream: { write: (msg: any) => debug(msg) } }));
 
     routerMediaOverlays.get(["/", "/" + _show + "/:" + mediaOverlayURLParam + "?"],
+        cors(server.corsOptionsDelegate),
         async (req: express.Request, res: express.Response) => {
 
             const reqparams = (req as IRequestPayloadExtension).params;
@@ -185,8 +187,6 @@ export function serverMediaOverlays(server: Server, routerPathBase64: express.Ro
                     "</body></html>");
             } else {
                 // absolutizeURLs(jsonObj);
-
-                server.setResponseCORS(res);
                 res.set("Content-Type", "application/vnd.syncnarr+json; charset=utf-8");
 
                 const jsonStr = isCanonical ?

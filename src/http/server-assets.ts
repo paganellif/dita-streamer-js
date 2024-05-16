@@ -9,6 +9,7 @@ import * as debug_ from "debug";
 import * as express from "express";
 import * as mime from "mime-types";
 import * as path from "path";
+import * as cors from "cors";
 
 import { zipHasEntry } from "@r2-shared-js/_utils/zipHasEntry";
 import { Publication } from "@r2-shared-js/models/publication";
@@ -35,7 +36,7 @@ export function serverAssets(server: Server, routerPathBase64: express.Router) {
     const routerAssets = express.Router({ strict: false });
     // routerAssets.use(morgan("combined"), { stream: { write: (msg: any) => debug(msg) } }));
 
-    routerAssets.get("/",
+    routerAssets.get("/", cors(server.corsOptionsDelegate),
         async (req: express.Request, res: express.Response) => {
 
             const reqparams = (req as IRequestPayloadExtension).params;
@@ -326,8 +327,6 @@ export function serverAssets(server: Server, routerPathBase64: express.Router) {
 
                 return;
             }
-
-            server.setResponseCORS(res);
 
             if (isPartialByteRangeRequest || isEncrypted) {
                 server.setResponseCacheHeaders(res, false);

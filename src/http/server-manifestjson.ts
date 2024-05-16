@@ -12,6 +12,7 @@ import * as DotProp from "dot-prop";
 import * as express from "express";
 import * as jsonMarkup from "json-markup";
 import * as path from "path";
+import * as cors from "cors";
 
 import { TaJsonSerialize } from "@r2-lcp-js/serializable";
 import { Publication } from "@r2-shared-js/models/publication";
@@ -61,6 +62,7 @@ export function serverManifestJson(server: Server, routerPathBase64: express.Rou
     // routerManifestJson.use(morgan("combined", { stream: { write: (msg: any) => debug(msg) } }));
 
     routerManifestJson.get(["/", "/" + _show + "/:" + _jsonPath + "?"],
+        cors(server.corsOptionsDelegate),
         async (req: express.Request, res: express.Response) => {
 
             const reqparams = (req as IRequestPayloadExtension).params;
@@ -386,7 +388,6 @@ export function serverManifestJson(server: Server, routerPathBase64: express.Rou
                     // "<p><pre>" + dumpStr + "</pre></p>" +
                     "</body></html>");
             } else {
-                server.setResponseCORS(res);
                 res.set("Content-Type", `${contentType}; charset=utf-8`);
 
                 const publicationJsonObj = TaJsonSerialize(publication);

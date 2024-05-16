@@ -8,6 +8,7 @@
 import * as express from "express";
 import { html as beautifyHtml } from "js-beautify";
 import * as path from "path";
+import * as cors from "cors";
 
 import { encodeURIComponent_RFC3986, isHTTP } from "@r2-utils-js/_utils/http/UrlUtils";
 
@@ -29,15 +30,13 @@ import { serverVersion_PATH } from "./server-version";
 
 export function serverRoot(server: Server, topRouter: express.Application) {
 
-    topRouter.options("*", (_req: express.Request, res: express.Response) => {
+    topRouter.options("*", cors(server.corsOptionsDelegate), (_req: express.Request, res: express.Response) => {
 
         // console.log(req.url);
 
         // Object.keys(req.headers).forEach((header: string) => {
         //     console.log(header + " => " + req.headers[header]);
         // });
-
-        server.setResponseCORS(res);
 
         const serverData = server.serverInfo();
         if (serverData && serverData.trustKey &&

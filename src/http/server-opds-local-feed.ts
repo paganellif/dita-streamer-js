@@ -12,6 +12,7 @@ import * as DotProp from "dot-prop";
 import * as express from "express";
 import * as jsonMarkup from "json-markup";
 import * as path from "path";
+import * as cors from "cors";
 
 import { JsonArray, TaJsonSerialize } from "@r2-lcp-js/serializable";
 import { OPDSLink } from "@r2-opds-js/opds/opds2/opds2-link";
@@ -61,6 +62,7 @@ export function serverOPDS_local_feed(server: Server, topRouter: express.Applica
     // routerOPDS2.use(morgan("combined", { stream: { write: (msg: any) => debug(msg) } }));
 
     routerOPDS_local_feed.get(["/", "/" + _show + "/:" + _jsonPath + "?"],
+        cors(server.corsOptionsDelegate),
         (req: express.Request, res: express.Response) => {
 
             const reqparams = (req as IRequestPayloadExtension).params;
@@ -262,7 +264,6 @@ export function serverOPDS_local_feed(server: Server, topRouter: express.Applica
                     // "<p><pre>" + dumpStr + "</pre></p>" +
                     "</body></html>");
             } else {
-                server.setResponseCORS(res);
                 res.set("Content-Type", "application/opds+json; charset=utf-8");
 
                 const publicationsJsonObj = TaJsonSerialize(feed);
@@ -314,9 +315,6 @@ export function serverOPDS_local_feed(server: Server, topRouter: express.Applica
         if (i >= 0) {
             redirect += req.originalUrl.substr(i);
         }
-
-        // No need for CORS with "show" URL redirect
-        // server.setResponseCORS(res);
 
         debug(`REDIRECT: ${req.originalUrl} ==> ${redirect}`);
         res.redirect(301, redirect);
