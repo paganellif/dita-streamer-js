@@ -184,7 +184,7 @@ Disallow: /
         });
     }
 
-    public expressUse(pathf: string, func: express.Handler, enableCORS: boolean = false) {
+    public expressUse(pathf: string, func: express.Handler, enableCORS = false) {
         if(enableCORS) {
             this.expressApp.use(pathf, cors(this.corsOptionsDelegate), func);
         } else {
@@ -192,7 +192,7 @@ Disallow: /
         }
     }
 
-    public expressGet(paths: string[], func: express.Handler, enableCORS: boolean = false) {
+    public expressGet(paths: string[], func: express.Handler, enableCORS = false) {
         if(enableCORS) {
             this.expressApp.get(paths, cors(this.corsOptionsDelegate), func);
         } else {
