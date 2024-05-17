@@ -208,12 +208,11 @@ server.expressUse("/static-files", express.static("/path/to/files", {
 }));
 
 server.expressGet(["/hello.html"], (req: express.Request, res: express.Response) => {
-
-  // Optionally, to add permissive CORS headers to the HTTP response
-  server.setResponseCORS(res);
-
-  res.status(200).send("<html><body>Hello</body></html>");
-});
+    res.status(200).send("<html><body>Hello</body></html>");
+  },
+  // Optionally, to add permissive CORS headers to the HTTP response `enableCORS: boolean`
+  true
+);
 ```
 
 To register publications references (local filesystem paths) inside the internal server state
