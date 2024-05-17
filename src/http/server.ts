@@ -184,12 +184,20 @@ Disallow: /
         });
     }
 
-    public expressUse(pathf: string, func: express.Handler) {
-        this.expressApp.use(pathf, func);
+    public expressUse(pathf: string, func: express.Handler, enableCORS: boolean = false) {
+        if(enableCORS) {
+            this.expressApp.use(pathf, cors(this.corsOptionsDelegate), func);
+        } else {
+            this.expressApp.use(pathf, func);
+        }
     }
 
-    public expressGet(paths: string[], func: express.Handler) {
-        this.expressApp.get(paths, func);
+    public expressGet(paths: string[], func: express.Handler, enableCORS: boolean = false) {
+        if(enableCORS) {
+            this.expressApp.get(paths, cors(this.corsOptionsDelegate), func);
+        } else {
+            this.expressApp.get(paths, func);
+        }
     }
 
     public isStarted(): boolean {
