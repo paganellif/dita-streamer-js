@@ -13,6 +13,7 @@ import * as http from "http";
 import * as https from "https";
 import * as path from "path";
 import { tmpNameSync } from "tmp";
+import * as cors from "cors";
 
 import { TaJsonDeserialize } from "@r2-lcp-js/serializable";
 import { OPDSFeed } from "@r2-opds-js/opds/opds2/opds2";
@@ -72,7 +73,7 @@ export class Server {
     public readonly readers: Readers;
     public readonly disableCORS: boolean;
     public readonly allowedOrigins: string[];
-    public readonly corsOptionsDelegate: any;
+    public readonly corsOptionsDelegate: cors.CorsOptionsDelegate;
 
     public readonly lcpBeginToken = "*-";
     public readonly lcpEndToken = "-*";
@@ -92,7 +93,6 @@ export class Server {
     private serverData: ServerData | undefined;
 
     constructor(options?: IServerOptions) {
-
         this.disableReaders = options && options.disableReaders ? options.disableReaders : false;
         this.disableDecryption = options && options.disableDecryption ? options.disableDecryption : false;
         this.disableRemotePubUrl = options && options.disableRemotePubUrl ? options.disableRemotePubUrl : false;
@@ -105,7 +105,7 @@ export class Server {
         ];
         this.disableCORS = options && options.disableCORS ? options.disableCORS : false;
         this.allowedOrigins = options && options.allowedOrigins ? options.allowedOrigins : ["*"];
-        this.corsOptionsDelegate = function (_req: any, callback: any) {
+        this.corsOptionsDelegate = (_req: cors.CorsRequest, callback: (err: Error | null, options?: cors.CorsOptions) => void) => {
             let corsOptions;
             if (this.disableCORS) {
                 corsOptions = { origin: false };

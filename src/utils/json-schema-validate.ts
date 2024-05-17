@@ -175,7 +175,7 @@ export function jsonSchemaValidate(
 
         const errs: JsonSchemaValidationError[] = [];
         errs.push({
-            ajvDataPath: err && toString ? err.toString() : "ajvDataPath",
+            ajvDataPath: err ? err.toString() : "ajvDataPath",
             ajvMessage: err.message ? err.message : "ajvMessage",
             ajvSchemaPath: "ajvSchemaPath",
             jsonPath: "jsonPath",
